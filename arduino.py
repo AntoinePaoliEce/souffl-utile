@@ -5,7 +5,7 @@ class Arduino():
     def __init__(self):
         # Arduino setup
         print('Program started')
-        self.arduino = serial.Serial('COM7', baudrate=9600, timeout=1)
+        self.arduino = serial.Serial('/dev/cu.usbserial-14210', baudrate=9600, timeout=1)
         print('Established serial connection to Arduino')
         self.CONFIGURED = False
 

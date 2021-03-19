@@ -1,6 +1,8 @@
 #https://www.edureka.co/blog/snake-game-with-pygame/
 
 import time
+!pip3 install pygame
+!pip3 install pyserial
 import pygame # pip install pygame
 import random
 from button import Button
@@ -152,11 +154,9 @@ class Snake():
             if self.outputs[-3] > 600 and self.outputs[-1] > 600: #INCREASE SPEED
                 if(self.snake_speed > 1):
                     self.snake_speed += 1
-                    self.snake_block += 1
             elif self.outputs[-2] < 400 and self.outputs[-1] < 400: #DECREASE SPEED
                 if(self.snake_speed > 1):
                     self.snake_speed -= 1
-                    self.snake_block -= 1
             elif self.outputs[-3] < 600 and self.outputs[-2] > 600 and self.outputs[-1] < 600: #quit UPDATE SPEED
                 self.in_update_speed = not self.in_update_speed
                 self.outputs = list(np.ones(5)*535)
