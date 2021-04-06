@@ -6,5 +6,14 @@ This project is an Handitech project.
  ```pip install pygame```
  * install pyserial v3.5 in your python environment.</br>
  ```pip install serial```
- * open your Arduino code in the Arduino IDE and game.py in your python IDE
- * Change 
+
+# Plug in the Arduino
+
+# Open your Arduino code in the Arduino IDE
+ * Card type --> Arduino Nano (if you are using one)
+ * Change in Arduino.py the **port name** that you can find here:
+ your arduino IDE --> Tools --> Port
+ * Verify your code on Arduino (do not upload)
+
+# Open game.py in your python IDE
+ * run game.py
