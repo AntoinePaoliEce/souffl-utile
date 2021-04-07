@@ -30,18 +30,18 @@ class Arduino():
             if self.outputs[-2] < 600 and self.outputs[-2] > 400 and self.outputs[-1] < 600 and self.outputs[-1] > 400 and self.outputs[-0] < 600 and self.outputs[-0] > 400:
                 return 0
 
-            if self.outputs[-2] > 600 and self.outputs[-1] > 600:# long blow
+            if self.outputs[-2] > 600 and self.outputs[-1] > 600:# souffle long
                 self.outputs = list(np.ones(5)*535)    
                 return 1
                 
-            elif self.outputs[-2] < 400 and self.outputs[-1] < 400: # long breath
+            elif self.outputs[-2] < 400 and self.outputs[-1] < 400: # aspiration longue
                 self.outputs = list(np.ones(5)*535)
                 return 2
-            elif self.outputs[-3] < 600 and self.outputs[-2] > 600 and self.outputs[-1] < 600: #short blow
+            elif self.outputs[-3] < 600 and self.outputs[-2] > 600 and self.outputs[-1] < 600: #souffle court
                 self.outputs = list(np.ones(5)*535)    
                 return 3
 
-            elif self.outputs[-3] > 400 and self.outputs[-2] < 400 and self.outputs[-1] > 400: #short breath
+            elif self.outputs[-3] > 400 and self.outputs[-2] < 400 and self.outputs[-1] > 400: #inspiration courte
                 self.outputs = list(np.ones(5)*535)    
                 return 4
                 
