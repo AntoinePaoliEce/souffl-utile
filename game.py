@@ -1,8 +1,6 @@
 #https://www.edureka.co/blog/snake-game-with-pygame/
 
 import time
-!pip3 install pygame
-!pip3 install pyserial
 import pygame # pip install pygame
 import random
 from button import Button
@@ -13,7 +11,6 @@ class Snake():
     def __init__(self):
         # Arduino setup
         self.arduino = Arduino()
-        self.outputs = list(np.ones(5)*535)
 
         # Snake setup
         pygame.init()
@@ -53,7 +50,7 @@ class Snake():
         self.button2 = Button("Blow setting: Turn "+self.actions[0]+" (opposite for "+self.actions[1]+")", self.font, x=self.screen_width/1.85, y=self.screen_height/2, bg="navy")
 
     def Your_score(self, score):
-        value = self.score_font.render("Your Score: " + str(score), True, self.yellow)
+        value = self.score_font.render("Score: " + str(score), True, self.yellow)
         self.screen.blit(value, [0, 0])
 
     def our_snake(self, snake_block, snake_list):
@@ -66,25 +63,28 @@ class Snake():
 
     def endMenu(self,Length_of_snake):
         self.screen.fill(self.blue)
-        self.message("You Lost! Press C-Play Again or Q-Quit", self.red)
+        self.message("Perdu! Aspirez longtemps pour rejouer", self.red)
+        self.message("Ou soufflez longtemps pour quitter", self.red,height_ratio=2)
         self.Your_score(Length_of_snake - 1)
         pygame.display.update()
- 
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q:
-                    self.game_over = True
-                    self.in_endgame_menu = False
-                if event.key == pygame.K_c:
-                    self.current_action ="RIGHT"
-                    self.direction ="UP"
-                    self.run() #rerun the game
+        
+        breath = self.arduino.read()
+        if breath == 0:
+            return
+        elif breath == 1: #QUIT
+            self.game_over = True
+            self.in_endgame_menu = False
+        elif breath == 2: #Continue
+            self.current_action ="RIGHT"
+            self.direction ="UP"
+            self.in_endgame_menu = False
+            self.run() #rerun the game
 
     def settings(self):
         self.screen.fill(self.blue)
-        self.message("Settings", self.green, height_ratio=5)
-        self.message("Press C-Play Again", self.red, height_ratio=3.8)
-        self.message("Press Q-Quit", self.red, height_ratio=3.1)
+        self.message("Parametres", self.green, height_ratio=5)
+        self.message("Aspirez longtemps pour retourner au jeu", self.red, height_ratio=3.8)
+        self.message("Soufflez longtemps pour quitter", self.red, height_ratio=3.1)
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -104,7 +104,7 @@ class Snake():
         if self.in_update_controls:
             self.button2.change_text(str("<->"), "red")
         elif not self.in_update_controls:
-            self.button2.change_text("Blow setting: Turn "+self.actions[0]+" (opposite for "+self.actions[1]+")", "navy")
+            self.button2.change_text("Souffle court: "+self.actions[0] + " Aspiration courte: " + self.actions[1], "navy")
         
         
         self.button1.show(self.screen)
@@ -112,65 +112,54 @@ class Snake():
         pygame.display.update()
         
     def updateControlsGame(self):
-        self.outputs.append(self.arduino.read())
-
-        print(len(self.outputs), self.outputs[-4:-1])
-         
-        if self.outputs[-2] > 600 and self.outputs[-1] > 600:# QUIT
+        breath = self.arduino.read()
+        if breath == 0:
+            return
+        elif breath == 1:# QUIT
             self.game_over = True
-            self.outputs = list(np.ones(5)*535)
-        elif self.outputs[-2] < 400 and self.outputs[-1] < 400: #SETTINGS
+        elif breath == 2: #SETTINGS
             self.in_settings = True
-            self.outputs = list(np.ones(5)*535)
-        elif self.outputs[-3] < 600 and self.outputs[-2] > 600 and self.outputs[-1] < 600: #TURN RIGHT
+        elif breath == 3: #TURN RIGHT
             self.current_action = self.actions[0] #initially right
-            self.outputs = list(np.ones(5)*535)
-        elif self.outputs[-3] > 400 and self.outputs[-2] < 400 and self.outputs[-1] > 400: #TURN LEFT
+        elif breath == 4: #TURN LEFT
             self.current_action = self.actions[1] #initially left
-            self.outputs = list(np.ones(5)*535)
             
         #time.sleep(0.05)
 
     def updateControlsSettings(self):
-        self.outputs.append(self.arduino.read())
+        breath = self.arduino.read()
 
-        print(len(self.outputs), self.outputs[-4 : -1], self.in_update_speed, self.in_update_controls)
+        if breath == 0:
+            return
 
         if not self.in_update_speed and not self.in_update_controls:
-            if self.outputs[-3] > 600 and self.outputs[-1] > 600: #QUIT
+            if breath == 1: #QUIT
                 self.game_over = True
                 self.in_settings = False
-                self.outputs = list(np.ones(5)*535)
-            elif self.outputs[-2] < 400 and self.outputs[-1] < 400: #QUIT SETTINGS/CONTINUE
+            elif breath == 2: #QUIT SETTINGS/CONTINUE
                 self.in_settings = not self.in_settings
-                self.outputs = list(np.ones(5)*535)
-            elif self.outputs[-3] < 600 and self.outputs[-2] > 600 and self.outputs[-1] < 600: #UPDATE SPEED
-                self.in_update_speed = not self.in_update_speed 
-                self.outputs = list(np.ones(5)*535)
-            elif self.outputs[-3] > 400 and self.outputs[-2] < 400 and self.outputs[-1] > 400: #UPDATE CONTROL
+            elif breath == 3: #UPDATE SPEED
+                self.in_update_speed = not self.in_update_speed
+            elif breath == 4: #UPDATE CONTROL
                 self.in_update_controls = not self.in_update_controls
-                self.outputs = list(np.ones(5)*535)
         elif self.in_update_speed:
-            if self.outputs[-3] > 600 and self.outputs[-1] > 600: #INCREASE SPEED
+            if breath == 1: #INCREASE SPEED
                 if(self.snake_speed > 1):
                     self.snake_speed += 1
-            elif self.outputs[-2] < 400 and self.outputs[-1] < 400: #DECREASE SPEED
+            elif breath == 2: #DECREASE SPEED
                 if(self.snake_speed > 1):
                     self.snake_speed -= 1
-            elif self.outputs[-3] < 600 and self.outputs[-2] > 600 and self.outputs[-1] < 600: #quit UPDATE SPEED
+            elif breath == 3: #quit UPDATE SPEED
                 self.in_update_speed = not self.in_update_speed
-                self.outputs = list(np.ones(5)*535)
         elif self.in_update_controls:
-            if self.outputs[-3] < 600 and self.outputs[-2] > 600 and self.outputs[-1] < 600: #Short strong blow becomes new RIGHT
+            if breath == 3: #Short strong blow becomes new RIGHT
                 if self.actions[0] == "LEFT":
                     self.actions = list(reversed(self.actions))
                 self.in_update_controls = not self.in_update_controls #when a control is changed it updates it
-                self.outputs = list(np.ones(5)*535)
-            elif self.outputs[-3] > 400 and self.outputs[-2] < 400 and self.outputs[-1] > 400: #Short strong insparation new RIGHT
+            elif breath == 4: #Short strong breath new RIGHT
                 if self.actions[0] == "RIGHT":
                     self.actions = list(reversed(self.actions))
                 self.in_update_controls = not self.in_update_controls #when a control is changed it updates it
-                self.outputs = list(np.ones(5)*535)
                 
         
         #time.sleep(0.05)
@@ -194,16 +183,17 @@ class Snake():
             
             self.updateControlsGame()
 
-            print(self.current_action, self.outputs[-3:-1], self.direction)
             #End Menu
             while self.in_endgame_menu == True:
-                self.updateControlsGame()
                 self.endMenu(Length_of_snake)
 
             #Settings
             while self.in_settings == True:
                 self.updateControlsSettings()
                 self.settings()
+                
+            if self.game_over: 
+                break
                                 
             # Control panel
             if (self.direction == "UP" and self.current_action == "LEFT") or (self.direction == "DOWN" and self.current_action == "RIGHT"): # go left
@@ -211,34 +201,21 @@ class Snake():
                 y1_change = 0
                 self.direction = "LEFT"
                 self.current_action = ""
-                self.outputs = list(np.ones(5)*535)
             elif (self.direction == "UP" and self.current_action == "RIGHT") or (self.direction == "DOWN" and self.current_action == "LEFT"): # go right
                 x1_change = self.snake_block
                 y1_change = 0
                 self.direction = "RIGHT"
                 self.current_action = ""
-                self.outputs = list(np.ones(5)*535)
             elif (self.direction == "LEFT" and self.current_action == "RIGHT") or (self.direction == "RIGHT" and self.current_action == "LEFT"): # go up
                 y1_change = -self.snake_block
                 x1_change = 0
                 self.direction = "UP"
                 self.current_action = ""
-                self.outputs = list(np.ones(5)*535)
             elif self.direction == self.current_action: # go down
                 y1_change = self.snake_block
                 x1_change = 0
                 self.direction = "DOWN"
                 self.current_action = ""
-                self.outputs = list(np.ones(5)*535)
-                
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.game_over = True
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_a: # settings
-                        self.in_settings = True
-                    elif event.key == pygame.K_q: # quit the game
-                        self.game_over = True
      
             if x1 >= self.screen_width or x1 < 0 or y1 >= self.screen_height or y1 < 0:
                 self.in_endgame_menu = True
@@ -268,8 +245,6 @@ class Snake():
                 Length_of_snake += 1
      
             self.clock.tick(self.snake_speed)
-            if len(self.outputs) > 10000:
-                self.outputs = list(np.ones(5)*535)
  
         pygame.quit()
         self.arduino.stop()
