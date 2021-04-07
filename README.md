@@ -1,19 +1,19 @@
 # Souffl-utile
-This project is an Handitech project.
+Ce projet a été fait en partenariat avec Handitech.
 
 ## Installation
- * install pygame v2.0.1 in your python environment.</br>
+ * installer pygame v2.0.1 dans votre environnement python.</br>
  ```pip install pygame```
- * install pyserial v3.5 in your python environment.</br>
+ * installer pyserial v3.5 dans votre environnement python.</br>
  ```pip install serial```
 
-## Plug in the Arduino
+## Brancher l'Arduino
 
-## Open your Arduino code in the Arduino IDE
- * Card type --> Arduino Nano (if you are using one)
- * Change in Arduino.py the **port name** that you can find here:
- your arduino IDE --> Tools --> Port
- * Verify your code on Arduino (do not upload)
+## Ouvrir votre code Arduino dans votre IDE Arduino
+ * Card type --> Arduino Nano (Si vous en utilisez une)
+ * Changer dans Arduino.py le **port name** que vous pouvez trouver ici:
+ Arduino IDE --> Outils --> Port
+ * Appuyer sur Vérifier (ne pas téléverser)
 
-## Open game.py in your python IDE
+## Ouvrir game.py dans votre IDE Python (exemple: Spyder)
  * run game.py
